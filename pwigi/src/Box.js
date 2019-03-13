@@ -9,6 +9,11 @@ export default class Box extends React.Component {
 				<div className="Lupitaimages">
 				<img src={process.env.PUBLIC_URL + this.props.item.articles_photo1} alt="can't load"/>
 				</div>
+				<div className="Subtittle">
+				<p>{this.props.item.articles_presentation}</p>
+				</div>
+				
+
             </div>
 			//<img src={require('this.props.articles_photo1')} alt="impossible to load"></img> 
             

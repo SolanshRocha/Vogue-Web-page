@@ -1,12 +1,17 @@
 const sqlite3 = require('sqlite3').verbose();
 
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 const dbFile = 'pwigy.db';
 const db = new sqlite3.Database(dbFile);
 app.use(cors());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
 
 db.serialize( () => {
         console.log("Pwigy");
@@ -38,14 +43,16 @@ db.serialize( () => {
 
         db.run('CREATE TABLE IF NOT EXISTS products (products_id INTEGER PRIMARY KEY AUTOINCREMENT, products_name TEXT, products_image TEXT, products_price NUMBER, products_description TEXT, products_category_id INTEGER, type_id INTEGER, FOREIGN KEY(products_category_id) REFERENCES products_category(products_category_id), FOREIGN KEY (type_id) REFERENCES type(type_id))');
 
-        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Suit', "Suits.jpg", 250, "Best color to wear with your skin tone", 1, 2);
-        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Suit', "suits2.jpg", 100, "White and black suits are about to take over your wardrobe", 1, 2);
-        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Coat', "burberry.jpg", 1750, "Burberry London The Kensington Mid Cotton-Gabardine Trench Coat", 2, 2);
-        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Dress', "dresssummer.jpg", 95, "Rust red slip dress", 3, 2);
-        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Shoes', "miumiu.jpg", 300, "Back to schoo life ", 5, 2);
-        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Purse', "prada.jpg", 1400, "Panelled 'city' calfskin and Saffiano leather tote in black. Twin rolled carry handles featuring detachable keyring at top", 4, 2);
-        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Maternity', "maternitybikin.jpg", 250, "Shop. Rent. Consign. Gently used designer maternity brands you love at up to 90% off retail! MotherhoodCloset.com Maternity ", 6, 2);
+        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Suit', "products/Suits.jpg", 250, "Best color to wear with your skin tone", 1, 2);
+        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Suit', "products/suits2.jpg", 100, "White and black suits are about to take over your wardrobe", 1, 2);
+        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Coat', "products/burberry.jpg", 1750, "Burberry London The Kensington Mid Cotton-Gabardine Trench Coat", 2, 2);
+        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Dress', "products/dresssummer.jpg", 95, "Rust red slip dress", 3, 2);
+        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Shoes', "products/miumiu.jpg", 300, "Back to schoo life ", 5, 2);
+        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Purse', "products/prada.jpg", 1400, "Panelled 'city' calfskin and Saffiano leather tote in black. Twin rolled carry handles featuring detachable keyring at top", 4, 2);
+        db.run('INSERT INTO products (products_name, products_image, products_price, products_description, products_category_id, type_id) VALUES (?, ?, ?, ?, ?, ?)', 'Maternity', "products/maternitybikin.jpg", 250, "Shop. Rent. Consign. Gently used designer maternity brands you love at up to 90% off retail! MotherhoodCloset.com Maternity ", 6, 2);
 
+        db.run('CREATE TABLE IF NOT EXISTS comments (comments_id INTEGER PRIMARY KEY AUTOINCREMENT, comments_body VACHAR(250), articles_id INTEGER, FOREIGN KEY (articles_id) REFERENCES articles(articles_id))')
+        
         db.all('SELECT * FROM type NATURAL JOIN articles_category NATURAL JOIN articles', function(error, data) {
         if (!error) console.log(data);
       else console.log(error);
@@ -59,6 +66,25 @@ app.get('/', function(request, response) {
         if (!error) response.send(data);
       else console.log(error);
     })
+})
+
+app.get('/products', function(request, response) {
+  db.all('SELECT * FROM type NATURAL JOIN products NATURAL JOIN products_category', function(error, data) {
+      if (!error) response.send(data);
+    else console.log(error);
+  })
+});
+
+app.get('/comments', function(request, response){
+  db.all('SELECT * FROM comments', function(error, data) {
+    if (!error) response.send(data);
+    else console.log(error);
+  })
+});
+
+app.post('/comments_body', function (request, response){
+  db.run('INSERT INTO(comments_body) VALUES (?)', request.body.comments_body);
+  console.log(request.body.comments_body);
 })
 
 app.listen(3000, function(error) {
@@ -81,12 +107,7 @@ app.get('/type', function(request, response) {
   })
 });
 
-app.get('/products', function(request, response) {
-  db.all('SELECT * FROM type NATURAL JOIN products NATURAL JOIN products_category', function(error, data) {
-      if (!error) response.send(data);
-    else console.log(error);
-  })
-});
+
 
 app.get('/products_category', function(request, response) {
   db.all('SELECT * FROM type NATURAL JOIN products_category NATURAL JOIN articles_category', function(error, data) {

@@ -4,6 +4,8 @@ import Nav from './Nav';
 import Gallery from './Gallery.js';
 import Footer from './Footer.js';
 import './App.css';
+import Post from './Post.js';
+
 
 
 export default class App extends React.Component {
@@ -13,6 +15,7 @@ export default class App extends React.Component {
         <Header></Header>
         <Nav></Nav>
         <Gallery></Gallery>
+        <Post></Post>
         <Footer></Footer>
 
       </div>
