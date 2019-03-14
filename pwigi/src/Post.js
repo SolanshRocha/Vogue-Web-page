@@ -9,9 +9,18 @@ export default class Post extends React.Component {
         }
     }
 
+    HandleSolansh() {
+        let input = document.getElementById('Comentario').value 
+        if (input !== '') {
+            $.post('http://localhost:3000/comments', {comments : input}, function(response){
+                console.log(response);
+            })
+        }
+    }
+
     componentWillMount() {
     let that = this;
-    $.get('http://localhost:3000/Comments', function(data){
+    $.get('http://localhost:3000/comments', function(data){
         let comments = data.map(function(com, i){
             return (
                 <p key={i}>{com.comments_body}</p>
@@ -21,14 +30,17 @@ export default class Post extends React.Component {
     })
 }
     render () {
+        console.log(this.state.Comments);
         return (
-            <div>
+            <div className="Commentariohere">
                 <div id="CommentArea">
                     {this.state.Comments}
                 </div>
-                <form>
-                 <input id="Pseudo" type="text" name="name" action="/action_page.php"></input>
-                 <input id="Commentary" type="text" name="name" action="/action_page.php"></input>                    
+                <form className="lalaland" autoComplete="off">
+                <div className="missingcomment">
+                 <input id="Comentario" type="text" name="Comments"></input>
+                 <button id="Commentbutt" onClick={() =>{this.HandleSolansh()}}>envoyer</button>  
+                 </div>                   
                 </form>
             </div>
             

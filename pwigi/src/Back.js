@@ -82,10 +82,14 @@ app.get('/comments', function(request, response){
   })
 });
 
-app.post('/comments_body', function (request, response){
-  db.run('INSERT INTO(comments_body) VALUES (?)', request.body.comments_body);
-  console.log(request.body.comments_body);
+app.post('/comments', function (request, response){
+  db.run('INSERT INTO comments (comments_body) VALUES (?)', request.body.comments, function(error) { 
+    if(!error) response.send("hey i made a mistake");
+    else console.log(error);
+  })
 })
+  //console.log(request.body.comments_body);
+
 
 app.listen(3000, function(error) {
   if (!error) console.log("Bonjour");
